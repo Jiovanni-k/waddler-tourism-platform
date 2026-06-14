@@ -14,15 +14,16 @@
 3. [Technology Stack](#3-technology-stack)
 4. [System Architecture](#4-system-architecture)
 5. [Core Modules](#5-core-modules)
-6. [Getting Started](#6-getting-started)
-7. [Postman Setup & Usage](#7-postman-setup--usage)
-8. [Swagger / API Documentation](#8-swagger--api-documentation)
-9. [Authentication & Authorization](#9-authentication--authorization)
-10. [Email Notifications](#10-email-notifications)
-11. [Unit Testing](#11-unit-testing)
-12. [Business Logic Overview](#12-business-logic-overview)
-13. [Database Schema Summary](#13-database-schema-summary)
-14. [Future Microservices Strategy](#14-future-microservices-strategy)
+6. [Design Patterns Used](#6-design-patterns-used)
+7. [Getting Started](#7-getting-started)
+8. [Postman Setup & Usage](#8-postman-setup--usage)
+9. [Swagger / API Documentation](#9-swagger--api-documentation)
+10. [Authentication & Authorization](#10-authentication--authorization)
+11. [Email Notifications](#11-email-notifications)
+12. [Unit Testing](#12-unit-testing)
+13. [Business Logic Overview](#13-business-logic-overview)
+14. [Database Schema Summary](#14-database-schema-summary)
+15. [Future Microservices Strategy](#15-future-microservices-strategy)
 
 ---
 
@@ -171,7 +172,22 @@ Configurable refund rules based on days before check-in.
 
 ---
 
-## 6. Getting Started
+## 6. Design Patterns Used
+
+The backend uses six main design patterns to keep the modular monolith easier to extend, test, and later split into services.
+
+| Pattern | Where It Is Used | Purpose |
+|---|---|---|
+| Observer | `BookingServiceImpl`, booking event classes, `BookingNotificationListener` | Booking state changes publish domain events, and listeners handle side effects such as emails and loyalty points without coupling them directly to booking logic. |
+| Decorator | `payment/decorator/*`, `PaymentConfig`, `PaymentServiceImpl` | Payment behavior is extended through a validation chain: fraud checks, duplicate-payment prevention, and amount/split validation wrap the core payment service. |
+| Strategy | `RoomPricingStrategy`, `BudgetPricingStrategy`, `LuxuryPricingStrategy`, `RangePricingStrategy`, `NoPricingStrategy` | Room search selects different pricing-filter behavior depending on the provided min/max price inputs. |
+| Factory | `LoyaltyRewardFactory`, `LoyaltyReward` | Loyalty rewards are created from reward types in one central place, including booking points, group bonuses, and redemption rewards. |
+| Singleton | `HotelConfigService` | Shared hotel configuration values, such as allowed sort fields and maximum gallery/amenity limits, are exposed through one application-wide instance. |
+| Specification | `HotelSpecifications`, `BookingSpecification`, `PaymentSpecifications`, `RefundSpecifications`, and other `*Specification` classes | Dynamic filtering is built by composing reusable JPA `Specification` predicates for search, pagination, and admin/manager listing screens. |
+
+---
+
+## 7. Getting Started
 
 ### Prerequisites
 
@@ -233,7 +249,7 @@ The server starts at: `http://localhost:8080`
 
 ---
 
-## 7. Postman Setup & Usage
+## 8. Postman Setup & Usage
 
 > ⚠️ **Important:** You must complete the setup steps below before testing any authenticated endpoints.
 
@@ -293,7 +309,7 @@ All subsequent requests will automatically include the `Authorization: Bearer {{
 
 ---
 
-## 8. Swagger / API Documentation
+## 9. Swagger / API Documentation
 
 Swagger UI is available at:
 
@@ -325,7 +341,7 @@ http://localhost:8080/v3/api-docs
 
 ---
 
-## 9. Authentication & Authorization
+## 10. Authentication & Authorization
 
 The system uses **JWT (JSON Web Token)** authentication via Spring Security and OAuth2 Resource Server.
 
@@ -346,7 +362,7 @@ The system uses **JWT (JSON Web Token)** authentication via Spring Security and 
 
 ---
 
-## 10. Email Notifications
+## 11. Email Notifications
 
 Waddler sends automated emails for all major lifecycle events. The notification system uses Spring Boot Mail with HTML templates.
 
@@ -435,7 +451,7 @@ Sent to the user when support has responded to their contact/help request.
 
 
 
-## 11. Unit Testing
+## 12. Unit Testing
 
 All service-layer modules have dedicated unit tests using **JUnit 5** and **Mockito**.
 
@@ -494,7 +510,7 @@ Test reports are generated in `target/surefire-reports/`.
 
 ---
 
-## 12. Business Logic Overview
+## 13. Business Logic Overview
 
 ### Booking Flow
 
@@ -531,7 +547,7 @@ The system uses **pessimistic locking** on inventory records during booking crea
 
 ---
 
-## 13. Database Schema Summary
+## 14. Database Schema Summary
 
 The system uses **MySQL** with the following primary table groups:
 
@@ -552,7 +568,7 @@ Schema is auto-managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update`).
 
 ---
 
-## 14. Future Microservices Strategy
+## 15. Future Microservices Strategy
 
 This modular monolith is designed to be split into microservices in Step 2. Planned decomposition:
 
