@@ -222,8 +222,7 @@ AbsoluteCinema
 * Jiovanni Kitlo
 * Salma
 * Zeina
-* Miral Zeit
-* Ramez Michel
+
 
 ---
 
