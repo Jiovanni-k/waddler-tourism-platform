@@ -220,8 +220,8 @@ AbsoluteCinema
 ### Contributors
 
 * Jiovanni Kitlo
-* Salma
-* Zeina
+* Salma Abu Odeh
+* Zeina Ibrahim
 
 
 ---
